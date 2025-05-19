@@ -1,77 +1,70 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import init from './init';
 
-const canvas = document.querySelector('.canvas');
-const scene = new THREE.Scene();
+import './style.css';
 
-// Камера
-const camera = new THREE.PerspectiveCamera(
-	75,
-	window.innerWidth / window.innerHeight,
-	0.1,
-	1000,
+const { sizes, camera, scene, canvas, controls, renderer } = init();
+
+camera.position.set(0, 10, 10);
+
+const floor = new THREE.Mesh(
+	new THREE.PlaneGeometry(10, 10),
+	new THREE.MeshStandardMaterial({
+		color: '#444',
+		metalness: 0,
+		roughness: 0.5,
+	}),
 );
-camera.position.set(0, 2, 5);
 
-// Рендерер
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
+floor.receiveShadow = true;
+floor.rotation.x = -Math.PI * 0.5;
+// scene.add(floor);
 
-// Управление
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.61);
+hemiLight.position.set(0, 50, 0);
+scene.add(hemiLight);
 
-// Свет
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-scene.add(ambientLight);
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.54);
+dirLight.position.set(-8, 12, 8);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize = new THREE.Vector2(1024, 1024);
+scene.add(dirLight);
 
-// Загрузка модели
 const loader = new GLTFLoader();
-let currentModel = null;
-
-function loadModel(modelName) {
-	const modelPath = `models/${modelName}/scene.gltf`;
-
-	if (currentModel) {
-		scene.remove(currentModel);
-	}
-
-	loader.load(
-		modelPath,
-		(gltf) => {
-			currentModel = gltf.scene;
-			currentModel.scale.set(1, 1, 1); // при необходимости увеличь/уменьши
-			scene.add(currentModel);
-		},
-		undefined,
-		(error) => {
-			console.error(`Ошибка загрузки ${modelName}:`, error);
-		},
-	);
-}
-
-// Загрузка модели по умолчанию
-loadModel('Mir_castle');
-
-// Обработка выбора модели
-const modelSelector = document.getElementById('modelSelector');
-modelSelector.addEventListener('change', (e) => {
-	loadModel(e.target.value);
+loader.load('/models/Mir_castle/scene.gltf', (gltf) => {
+	console.log('success');
+	console.log(gltf);
+	scene.add(gltf.scene.children[0]);
 });
 
-// Анимация
-function animate() {
-	requestAnimationFrame(animate);
+const tick = () => {
 	controls.update();
 	renderer.render(scene, camera);
-}
-animate();
+	window.requestAnimationFrame(tick);
+};
+tick();
 
-// Адаптивность
+/** Базовые обпаботчики событий длы поддержки ресайза */
 window.addEventListener('resize', () => {
-	camera.aspect = window.innerWidth / window.innerHeight;
+	// Обновляем размеры
+	sizes.width = window.innerWidth;
+	sizes.height = window.innerHeight;
+
+	// Обновляем соотношение сторон камеры
+	camera.aspect = sizes.width / sizes.height;
 	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth, window.innerHeight);
+
+	// Обновляем renderer
+	renderer.setSize(sizes.width, sizes.height);
+	renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+	renderer.render(scene, camera);
+});
+
+window.addEventListener('dblclick', () => {
+	if (!document.fullscreenElement) {
+		canvas.requestFullscreen();
+	} else {
+		document.exitFullscreen();
+	}
 });

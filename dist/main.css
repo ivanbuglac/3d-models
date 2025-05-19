@@ -1,0 +1,50 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	overflow: hidden;
+}
+
+.canvas {
+	position: fixed;
+	top: 0;
+	left: 0;
+	outline: none;
+}
+
+.model-selector {
+	width: 300px;
+	padding: 10px 15px;
+	font-size: 16px;
+	border: 2px solid #888;
+	border-radius: 8px;
+	background-color: #f9f9f9;
+	color: #333;
+	margin: 20px auto;
+	display: block;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	transition:
+		border-color 0.3s,
+		box-shadow 0.3s;
+}
+
+.model-selector:focus {
+	border-color: #3b82f6;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+}
+
+label[for='modelSelector'] {
+	display: block;
+	text-align: center;
+	font-weight: 600;
+	margin-bottom: 8px;
+	color: #333;
+	font-size: 18px;
+}
+
+
+/*# sourceMappingURL=main.css.map*/
