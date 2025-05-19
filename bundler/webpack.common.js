@@ -9,6 +9,7 @@ module.exports = {
 		hashFunction: 'xxhash64',
 		filename: 'bundle.[contenthash].js',
 		path: path.resolve(__dirname, '../dist'),
+		publicPath: '/3d-models/', // <--- добавь это
 	},
 	devtool: 'source-map',
 	plugins: [
@@ -17,6 +18,10 @@ module.exports = {
 				{
 					from: path.resolve(__dirname, '../static'),
 					noErrorOnMissing: true,
+				},
+				{
+					from: path.resolve(__dirname, '../static/models'), // <--- добавлено
+					to: 'models', // скопирует в dist/models
 				},
 			],
 		}),
