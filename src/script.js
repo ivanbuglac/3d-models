@@ -1,48 +1,77 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-import init from './init';
+const canvas = document.querySelector('.canvas');
+const scene = new THREE.Scene();
 
-import './style.css';
+// Камера
+const camera = new THREE.PerspectiveCamera(
+	75,
+	window.innerWidth / window.innerHeight,
+	0.1,
+	1000,
+);
+camera.position.set(0, 2, 5);
 
-const { sizes, camera, scene, canvas, controls, renderer } = init();
+// Рендерер
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
 
-camera.position.z = 3;
+// Управление
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({
-	color: 'gray',
-	wireframe: true,
+// Свет
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+scene.add(ambientLight);
+
+// Загрузка модели
+const loader = new GLTFLoader();
+let currentModel = null;
+
+function loadModel(modelName) {
+	const modelPath = `models/${modelName}/scene.gltf`;
+
+	if (currentModel) {
+		scene.remove(currentModel);
+	}
+
+	loader.load(
+		modelPath,
+		(gltf) => {
+			currentModel = gltf.scene;
+			currentModel.scale.set(1, 1, 1); // при необходимости увеличь/уменьши
+			scene.add(currentModel);
+		},
+		undefined,
+		(error) => {
+			console.error(`Ошибка загрузки ${modelName}:`, error);
+		},
+	);
+}
+
+// Загрузка модели по умолчанию
+loadModel('Mir_castle');
+
+// Обработка выбора модели
+const modelSelector = document.getElementById('modelSelector');
+modelSelector.addEventListener('change', (e) => {
+	loadModel(e.target.value);
 });
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
 
-const tick = () => {
+// Анимация
+function animate() {
+	requestAnimationFrame(animate);
 	controls.update();
 	renderer.render(scene, camera);
-	window.requestAnimationFrame(tick);
-};
-tick();
+}
+animate();
 
-/** Базовые обпаботчики событий длы поддержки ресайза */
+// Адаптивность
 window.addEventListener('resize', () => {
-	// Обновляем размеры
-	sizes.width = window.innerWidth;
-	sizes.height = window.innerHeight;
-
-	// Обновляем соотношение сторон камеры
-	camera.aspect = sizes.width / sizes.height;
+	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
-
-	// Обновляем renderer
-	renderer.setSize(sizes.width, sizes.height);
-	renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-	renderer.render(scene, camera);
-});
-
-window.addEventListener('dblclick', () => {
-	if (!document.fullscreenElement) {
-		canvas.requestFullscreen();
-	} else {
-		document.exitFullscreen();
-	}
+	renderer.setSize(window.innerWidth, window.innerHeight);
 });
