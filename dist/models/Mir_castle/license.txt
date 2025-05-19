@@ -1,0 +1,11 @@
+Model Information:
+* title:	Mir castle, Belarus
+* source:	https://sketchfab.com/3d-models/mir-castle-belarus-11b6286ff1424ad3969aeef83aa7b21a
+* author:	omegian (https://sketchfab.com/omegian)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Mir castle, Belarus" (https://sketchfab.com/3d-models/mir-castle-belarus-11b6286ff1424ad3969aeef83aa7b21a) by omegian (https://sketchfab.com/omegian) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
